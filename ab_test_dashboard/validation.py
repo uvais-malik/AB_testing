@@ -38,6 +38,54 @@ def validate_experiment_data(data: pd.DataFrame) -> pd.DataFrame:
         raise DataValidationError(["The dataset is empty."])
 
     clean = data.copy()
+
+    # 1. AUTO-BINARIZE CONVERTED
+    numeric_outcome = pd.to_numeric(clean["converted"], errors="coerce")
+    if not (numeric_outcome.isin([0, 1]).all() or numeric_outcome.isna().all()):
+        clean["converted"] = (numeric_outcome > 0).astype("int8")
+    else:
+        clean["converted"] = numeric_outcome
+
+    # 2. AUTO-DEDUPLICATE USERS
+    duplicate_mask = clean["user_id"].notna() & clean["user_id"].duplicated(keep=False)
+    if duplicate_mask.any():
+        # Keep max conversion, keep first group
+        clean = clean.groupby("user_id", as_index=False).agg({
+            "group": "first",
+            "converted": "max"
+        })
+
+    # 3. AUTO-MAP GROUP NAMES
+    group_as_text = clean["group"].astype("string").str.strip().str.lower()
+    observed_groups = set(group_as_text.dropna().loc[lambda values: values.ne("")].unique())
+    if observed_groups != EXPECTED_GROUPS and len(observed_groups) == 2:
+        control_synonyms = {"control", "baseline", "a", "base"}
+        treatment_synonyms = {"treatment", "variant", "test", "b", "challenger"}
+        groups = list(observed_groups)
+        g1, g2 = groups[0], groups[1]
+        
+        mapping = {}
+        if g1 in control_synonyms or g2 in treatment_synonyms:
+            mapping[g1] = "control"
+            mapping[g2] = "treatment"
+        elif g2 in control_synonyms or g1 in treatment_synonyms:
+            mapping[g1] = "treatment"
+            mapping[g2] = "control"
+        else:
+            # Fallback: group with lowest conversion rate is control
+            cr1 = clean.loc[group_as_text == g1, "converted"].mean()
+            cr2 = clean.loc[group_as_text == g2, "converted"].mean()
+            if cr1 < cr2:
+                mapping[g1] = "control"
+                mapping[g2] = "treatment"
+            else:
+                mapping[g1] = "treatment"
+                mapping[g2] = "control"
+                
+        group_as_text = group_as_text.replace(mapping)
+        clean["group"] = group_as_text
+
+    # --- STRICT VALIDATION ---
     required = clean.loc[:, REQUIRED_COLUMNS]
 
     missing_counts = required.isna().sum()

@@ -12,6 +12,7 @@ from ab_test_dashboard.reporting import explain_result, results_summary
 from ab_test_dashboard.sample_data import make_sample_data
 from ab_test_dashboard.statistics import analyze_experiment, calculate_sample_size
 from ab_test_dashboard.validation import DataValidationError, validate_experiment_data
+from ab_test_dashboard.ai_mapping import map_columns_with_gemini
 
 st.set_page_config(
     page_title="A/B Test Decision Dashboard",
@@ -209,10 +210,20 @@ def _render_sidebar() -> tuple[pd.DataFrame | None, str, int]:
             help="How many users see this feature per month? Used to estimate real-world impact.",
         )
 
-    return data, source_label, monthly_users
+        st.divider()
+        st.markdown("**AI Settings**")
+        use_ai_mapping = st.checkbox("Auto-map columns using Gemini", value=True)
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except:
+            api_key = ""
+        if use_ai_mapping and not api_key:
+            api_key = st.text_input("Gemini API Key", type="password")
+
+    return data, source_label, monthly_users, use_ai_mapping, api_key
 
 
-raw_data, source_label, monthly_users = _render_sidebar()
+raw_data, source_label, monthly_users, use_ai_mapping, api_key = _render_sidebar()
 
 st.markdown('<p class="eyebrow">Experiment intelligence</p>', unsafe_allow_html=True)
 st.title("A/B Test Decision Dashboard")
@@ -229,10 +240,35 @@ if raw_data is None:
 try:
     data = validate_experiment_data(raw_data)
 except DataValidationError as error:
-    st.error("This dataset needs attention before it can be analyzed.")
-    for issue in error.issues:
-        st.markdown(f"- {issue}")
-    st.stop()
+    missing_cols_error = any("Missing required columns" in issue for issue in error.issues)
+    if missing_cols_error and use_ai_mapping and api_key:
+        with st.spinner("AI is analyzing column names..."):
+            try:
+                mapping = map_columns_with_gemini(raw_data, api_key)
+            except Exception as e:
+                mapping = {}
+                st.error(f"AI crashed with error: {e}")
+            if mapping:
+                st.success(f"AI auto-mapped columns: {mapping}")
+                raw_data = raw_data.rename(columns=mapping)
+                try:
+                    data = validate_experiment_data(raw_data)
+                except DataValidationError as e2:
+                    st.error("This dataset needs attention before it can be analyzed.")
+                    for issue in e2.issues:
+                        st.markdown(f"- {issue}")
+                    st.stop()
+            else:
+                st.error("This dataset needs attention before it can be analyzed.")
+                for issue in error.issues:
+                    st.markdown(f"- {issue}")
+                st.error(f"AI auto-mapping failed or couldn't find a mapping. Raw mapping returned: {mapping}")
+                st.stop()
+    else:
+        st.error("This dataset needs attention before it can be analyzed.")
+        for issue in error.issues:
+            st.markdown(f"- {issue}")
+        st.stop()
 
 result = analyze_experiment(data)
 banner_class = {
