@@ -7,9 +7,9 @@ import plotly.graph_objects as go
 from .statistics import AnalysisResult
 
 CONTROL_COLOR = "#64748B"
-TREATMENT_COLOR = "#0F766E"
-TEXT_COLOR = "#172033"
-GRID_COLOR = "#E2E8F0"
+TREATMENT_COLOR = "#00F0FF"
+TEXT_COLOR = "#E2E8F0"
+GRID_COLOR = "rgba(255, 255, 255, 0.05)"
 
 
 def _base_layout() -> dict:
@@ -18,7 +18,7 @@ def _base_layout() -> dict:
         "paper_bgcolor": "rgba(0,0,0,0)",
         "plot_bgcolor": "rgba(0,0,0,0)",
         "margin": {"l": 12, "r": 12, "t": 20, "b": 12},
-        "hoverlabel": {"bgcolor": "#FFFFFF"},
+        "hoverlabel": {"bgcolor": "#1E293B", "bordercolor": "#334155", "font": {"color": "#FFFFFF"}},
     }
 
 

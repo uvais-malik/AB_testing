@@ -24,29 +24,47 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    .stApp { background: #F8FAFC; }
+    .stApp {
+        background: linear-gradient(135deg, #09090E 0%, #111A28 50%, #150F24 100%);
+        color: #E2E8F0;
+    }
     [data-testid="stSidebar"] {
-        background: #0B1324;
-        border-right: 1px solid #1E293B;
+        background: rgba(15, 23, 42, 0.4) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
         width: 280px !important;
         min-width: 280px !important;
         max-width: 280px !important;
     }
     [data-testid="stSidebar"] * { color: #E2E8F0; }
     [data-testid="stSidebar"] .stRadio label {
-        background: #111C31;
-        border: 1px solid #24324A;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 0.65rem;
         padding: 0.55rem 0.7rem;
         margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    [data-testid="stSidebar"] .stRadio label:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-1px);
     }
     [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
-        background: #111C31;
-        border-color: #334155;
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
     }
     [data-testid="stSidebar"] .stDownloadButton button {
-        background: #0F766E;
-        border-color: #0F766E;
+        background: linear-gradient(90deg, #00F0FF 0%, #0066FF 100%);
+        border: none;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+    }
+    [data-testid="stSidebar"] .stDownloadButton button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
     }
     [data-testid="stSidebar"] .stDownloadButton button * {
         color: #FFFFFF !important;
@@ -57,9 +75,16 @@ st.markdown(
         padding-top: 4rem;
         padding-bottom: 4rem;
     }
-    h1, h2, h3 { letter-spacing: -0.025em; color: #172033; }
+    h1, h2, h3, h4, h5, h6 { 
+        letter-spacing: -0.025em; 
+        color: #F8FAFC !important; 
+        font-weight: 800;
+    }
+    p, span, div {
+        color: #CBD5E1;
+    }
     .eyebrow {
-        color: #0F766E;
+        color: #00F0FF;
         display: block;
         font-size: 0.78rem;
         font-weight: 800;
@@ -68,9 +93,10 @@ st.markdown(
         min-height: 1.25rem;
         text-transform: uppercase;
         margin-bottom: 0.35rem;
+        text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
     }
     .subtitle {
-        color: #64748B;
+        color: #94A3B8;
         font-size: 1.05rem;
         max-width: 760px;
         margin-top: -0.5rem;
@@ -78,38 +104,76 @@ st.markdown(
     }
     .result-banner {
         border-radius: 0.9rem;
-        padding: 1rem 1.15rem;
+        padding: 1.2rem 1.5rem;
         margin: 0.2rem 0 1.25rem 0;
-        border: 1px solid;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         font-weight: 750;
-        font-size: 1.03rem;
+        font-size: 1.1rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
-    .result-win { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
-    .result-loss { background: #FFF1F2; border-color: #FECDD3; color: #9F1239; }
-    .result-neutral { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+    .result-win { 
+        background: rgba(0, 255, 170, 0.1); 
+        border-color: rgba(0, 255, 170, 0.3); 
+        color: #00FFAA !important; 
+        box-shadow: 0 0 20px rgba(0, 255, 170, 0.1);
+    }
+    .result-loss { 
+        background: rgba(255, 42, 109, 0.1); 
+        border-color: rgba(255, 42, 109, 0.3); 
+        color: #FF2A6D !important; 
+        box-shadow: 0 0 20px rgba(255, 42, 109, 0.1);
+    }
+    .result-neutral { 
+        background: rgba(255, 204, 0, 0.1); 
+        border-color: rgba(255, 204, 0, 0.3); 
+        color: #FFCC00 !important; 
+        box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
+    }
     [data-testid="stMetric"] {
-        background: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 0.85rem;
-        padding: 1rem 1.05rem;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 1rem;
+        padding: 1.2rem 1.2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
     }
-    [data-testid="stMetricLabel"] { color: #64748B; font-weight: 650; }
-    [data-testid="stMetricValue"] { color: #172033; letter-spacing: -0.03em; }
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(0, 240, 255, 0.3);
+        box-shadow: 0 8px 15px rgba(0, 240, 255, 0.1);
+    }
+    [data-testid="stMetricLabel"] { 
+        color: #94A3B8; 
+        font-weight: 600; 
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    [data-testid="stMetricValue"] { 
+        color: #FFFFFF; 
+        letter-spacing: -0.02em; 
+        font-weight: 700;
+    }
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: #FFFFFF;
-        border-color: #E2E8F0;
-        border-radius: 0.9rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.08);
+        border-radius: 1rem;
+        backdrop-filter: blur(10px);
+        padding: 1rem;
     }
     .section-kicker {
-        color: #64748B;
-        font-size: 0.88rem;
-        margin-top: -0.65rem;
-        margin-bottom: 1rem;
+        color: #94A3B8;
+        font-size: 0.9rem;
+        margin-top: -0.8rem;
+        margin-bottom: 1.2rem;
     }
     .source-note {
-        background: #111C31;
-        border: 1px solid #24324A;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 0.7rem;
         padding: 0.7rem 0.8rem;
         color: #CBD5E1 !important;
@@ -117,28 +181,38 @@ st.markdown(
         line-height: 1.45;
     }
     .schema-code {
-        background: #111C31;
-        border: 1px solid #24324A;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 0.6rem;
-        color: #E2E8F0 !important;
-        font-family: monospace;
-        font-size: 0.82rem;
+        color: #00F0FF !important;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.85rem;
         padding: 0.65rem 0.7rem;
+        text-align: center;
+        letter-spacing: 0.05em;
     }
-    .footer-note { color: #94A3B8; font-size: 0.8rem; margin-top: 2rem; }
+    .footer-note { color: #64748B; font-size: 0.8rem; margin-top: 3rem; text-align: center; }
     .impact-box {
-        background: linear-gradient(135deg, #0F766E 0%, #0D6B63 100%);
-        border-radius: 1rem;
-        padding: 1.25rem 1.5rem;
-        margin: 0.5rem 0 1.5rem 0;
-        color: #FFFFFF;
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 1.2rem;
+        padding: 1.5rem 2rem;
+        margin: 1rem 0 2rem 0;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
-    .impact-box h4 { color: #FFFFFF; margin: 0 0 0.5rem 0; font-size: 1rem; }
+    .impact-box h4 { 
+        color: #FFFFFF !important; 
+        margin: 0 0 1rem 0; 
+        font-size: 1.1rem; 
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
     .impact-row { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 0.75rem; }
     .impact-item { flex: 1; min-width: 140px; }
-    .impact-label { font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.08em; }
-    .impact-value { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
-    .impact-sub { font-size: 0.8rem; opacity: 0.75; }
+    .impact-label { font-size: 0.75rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; }
+    .impact-value { font-size: 1.8rem; font-weight: 800; line-height: 1.2; color: #00F0FF; text-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+    .impact-sub { font-size: 0.8rem; color: #64748B; margin-top: 0.2rem; }
     </style>
     """,
     unsafe_allow_html=True,
