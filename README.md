@@ -41,6 +41,9 @@ No statistics degree required.
 
 ## Features
 
+- **AI-Powered Data Mapping** — Uses Google's Gemini to automatically understand and map messy, real-world column names into the required schema.
+- **Autonomous Data Cleaning** — Automatically deduplicates users and cleans up formatting (like converting revenue "$5.00" to binary conversion `1`).
+- **Premium Dark Glassmorphism UI** — A stunning, highly-polished modern aesthetic with neon accents and interactive micro-animations.
 - **Business Impact Panel** — projects extra conversions per month and year based on your monthly active user count
 - **Plain-English decision** — leads with the answer, not the formula
 - CSV upload with clear, aggregated validation feedback
@@ -142,7 +145,8 @@ ab-test-decision-dashboard/
 │   ├── reporting.py     # Plain-English explanations & CSV export
 │   ├── sample_data.py   # Deterministic synthetic dataset
 │   ├── statistics.py    # Z-test, CI, sample-size calculator
-│   └── validation.py    # CSV validation & normalization
+│   ├── validation.py    # CSV validation & normalization
+│   └── ai_mapping.py    # Gemini LLM integration for auto-mapping columns
 ├── data/upload_example.csv
 ├── docs/screenshots/dashboard.png
 ├── tests/
@@ -172,7 +176,9 @@ The suite covers validation failures, numerical calculations, decision branches,
 1. Push this repository to GitHub.
 2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/).
 3. Click **Create app**, select the repository and branch, set the main file to `app.py`.
-4. Click **Deploy** — no secrets, API keys, or database setup required.
+4. Click **Advanced settings**, find the **Secrets** box, and securely add your Gemini API Key:
+   `GEMINI_API_KEY = "your_actual_key_here"`
+5. Click **Deploy** — your app is now live with full AI capabilities!
 
 ---
 
